@@ -330,28 +330,45 @@ def setup_tmux():
         print_status("Tmux is not installed. Please install it with: apt-get install tmux", "error")
         return False
     
-    # Always use ZSH as the default shell in tmux
-    shell_path = "/bin/zsh"
+    # Create tmux logs directory
+    tmux_logs_path = Path("/root/tmux-logs")
+    tmux_logs_path.mkdir(parents=True, exist_ok=True)
     
     # Create tmux configuration
     tmux_conf_path = Path.home() / ".tmux.conf"
-    tmux_conf_content = f"""
-# Default Shell (using ZSH for optimal environment)
-set-option -g default-shell {shell_path}
+    tmux_conf_content = """
+# Default Shell
+set-option -g default-shell /bin/zsh
 
-# Increase history size
+# increase history size (Be careful making this too large)
 set -g history-limit 30000
 
-# Plugin list
+# List of plugins
+# to enable a plugin, use the 'set -g @plugin' syntax:
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'tmux-plugins/tmux-logging'
+
+# Set logging path
+set -g @logging-path "/root/tmux-logs"
 
 # Shift arrow to shift windows
 bind -n S-Left previous-window
 bind -n S-Right next-window
 
-# Scroll with mouse
+# set window title list colors
+set-window-option -g window-status-style fg=brightblue,bg=colour237,dim
+
+# active window title colors
+set-window-option -g window-status-current-style fg=brightgreen,bg=colour237,bright
+
+# show host name and IP address on right side of status bar
+set -g status-right-length 70
+set -g status-bg colour237
+set -g status-fg white
+set -g status-right "#[fg=white]Host: #[fg=green]#h#[fg=white] LAN: #[fg=green]#(ip addr show dev eth0 | grep "inet[^6]" | awk '{print $2}')#[fg=white] VPN: #[fg=green]#(ip addr show dev tun0 | grep "inet[^6]" | awk '{print $2}')"
+
+# scroll with mouse
 setw -g mouse on
 set -g terminal-overrides 'xterm*:smcup@:rmcup@'
 
@@ -361,6 +378,7 @@ run '~/.tmux/plugins/tpm/tpm'
     with open(tmux_conf_path, "w") as f:
         f.write(tmux_conf_content)
     print_status(f"Tmux configuration saved at {tmux_conf_path}", "success")
+    print_status(f"Tmux logs will be saved to {tmux_logs_path}", "info")
     
     # Install Tmux Plugin Manager if not already installed
     tpm_path = Path.home() / ".tmux/plugins/tpm"
@@ -376,7 +394,12 @@ run '~/.tmux/plugins/tpm/tpm'
     else:
         print_status("Tmux Plugin Manager is already installed", "success")
     
-    print_status("Note: ZSH will be used as the default shell in tmux. Please ensure ZSH is installed.", "info")
+    # Add reminder messages
+    print_status("\nIMPORTANT: To activate the new tmux configuration:", "info")
+    print_status("1. Create a new tmux session: tmux new -s <mysession>", "info")
+    print_status("2. Once in tmux, press CTRL+B followed by SHIFT+I to install plugins", "info")
+    print_status("3. To understand how to use tmux-logging, please refer to the following link: https://github.com/tmux-plugins/tmux-logging", "info")
+    print_status("4. Your tmux logs will be saved in /root/tmux-logs", "info")
     return True
 
 # Comment out the create_engagement_dirs function
