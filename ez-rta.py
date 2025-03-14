@@ -397,7 +397,7 @@ run '~/.tmux/plugins/tpm/tpm'
     # Add reminder messages
     print_status("\nIMPORTANT: To activate the new tmux configuration:", "info")
     print_status("1. Create a new tmux session: tmux new -s <mysession>", "info")
-    print_status("2. Once in tmux, press CTRL+B followed by SHIFT+I to install plugins", "info")
+    print_status("2. Once in tmux, press CTRL+B followed by SHIFT+I to ensure plugins are installed", "info")
     print_status("3. To understand how to use tmux-logging, please refer to the following link: https://github.com/tmux-plugins/tmux-logging", "info")
     print_status("4. Your tmux logs will be saved in /root/tmux-logs", "info")
     return True
