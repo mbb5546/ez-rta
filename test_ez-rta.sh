@@ -112,10 +112,8 @@ Detailed Results:
 # Function to clean environment
 clean_env() {
     echo -e "\n${YELLOW}Cleaning test environment...${NC}"
-    sudo rm -rf /root/tools /root/ez-rta-tools
-    sudo rm -rf /root/*-Q*-202*-*
+    sudo rm -rf /root/ez-rta-tools
     sudo rm -f ~/.tmux.conf
-    sudo rm -f ~/.zshrc
     sudo killall tmux 2>/dev/null
     echo -e "${GREEN}Environment cleaned${NC}"
 }
@@ -151,38 +149,19 @@ test_dependency_management() {
     run_test "Python Packages" "Virtualenv availability" "which virtualenv || true"
 }
 
-test_shell_environment() {
-    echo -e "\n${YELLOW}Testing Shell Environment${NC}"
-    run_test "Shell" "ZSH installation" "which zsh"
-    run_test "Shell" "ZSH config existence" "test -f ~/.zshrc"
-}
-
 test_tmux_setup() {
     echo -e "\n${YELLOW}Testing Tmux Setup${NC}"
     run_test "Tmux" "Tmux installation" "which tmux"
     run_test "Tmux" "Tmux config existence" "test -f ~/.tmux.conf"
     run_test "Tmux" "Tmux plugin manager" "test -d ~/.tmux/plugins/tpm"
-}
-
-test_directory_structure() {
-    echo -e "\n${YELLOW}Testing Directory Structure${NC}"
-    
-    # Create test engagement
-    echo -e "TIPT\nQ1\nMB\n" | sudo python3 ez-rta.py > /dev/null 2>&1
-    
-    run_test "Directory Structure" "Main engagement directory" "test -d /root/TIPT-Q1-2024-MB"
-    run_test "Directory Structure" "Nmap directory" "test -d /root/TIPT-Q1-2024-MB/nmap"
-    run_test "Directory Structure" "Hosts directory" "test -d /root/TIPT-Q1-2024-MB/hosts"
-    run_test "Directory Structure" "NXC directory" "test -d /root/TIPT-Q1-2024-MB/nxc"
-    run_test "Directory Structure" "Loot directory" "test -d /root/TIPT-Q1-2024-MB/loot"
-    run_test "Directory Structure" "Web directory" "test -d /root/TIPT-Q1-2024-MB/web"
+    run_test "Tmux" "ZSH shell configuration" "grep 'set-option -g default-shell /bin/zsh' ~/.tmux.conf"
 }
 
 test_tools_installation() {
     echo -e "\n${YELLOW}Testing Tools Installation${NC}"
-    run_test "Tools" "Tools directory existence" "test -d /root/tools || test -d /root/ez-rta-tools"
-    run_test "Tools" "Pretender installation" "test -f /root/tools/pretender/pretender || test -f /root/ez-rta-tools/pretender/pretender"
-    run_test "Tools" "DC-Lookup script" "test -d /root/tools/dc-lookup || test -d /root/ez-rta-tools/dc-lookup"
+    run_test "Tools" "Tools directory existence" "test -d /root/ez-rta-tools"
+    run_test "Tools" "Pretender installation" "test -f /root/ez-rta-tools/pretender/pretender"
+    run_test "Tools" "DC-Lookup script" "test -d /root/ez-rta-tools/dc-lookup"
 }
 
 # Main testing sequence
@@ -197,9 +176,7 @@ main() {
     test_basic_setup
     test_system_updates
     test_dependency_management
-    test_shell_environment
     test_tmux_setup
-    test_directory_structure
     test_tools_installation
     
     # Generate and display summary

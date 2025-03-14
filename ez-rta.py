@@ -330,19 +330,13 @@ def setup_tmux():
         print_status("Tmux is not installed. Please install it with: apt-get install tmux", "error")
         return False
     
-    # Check if zsh is installed, use bash as fallback
-    try:
-        subprocess.run("zsh --version", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        shell_path = "/bin/zsh"
-        print_status("Using zsh as default shell in tmux", "success")
-    except subprocess.CalledProcessError:
-        shell_path = "/bin/bash"
-        print_status("Zsh not found, using bash as default shell in tmux", "warning")
+    # Always use ZSH as the default shell in tmux
+    shell_path = "/bin/zsh"
     
     # Create tmux configuration
     tmux_conf_path = Path.home() / ".tmux.conf"
     tmux_conf_content = f"""
-# Default Shell
+# Default Shell (using ZSH for optimal environment)
 set-option -g default-shell {shell_path}
 
 # Increase history size
@@ -382,10 +376,13 @@ run '~/.tmux/plugins/tpm/tpm'
     else:
         print_status("Tmux Plugin Manager is already installed", "success")
     
+    print_status("Note: ZSH will be used as the default shell in tmux. Please ensure ZSH is installed.", "info")
     return True
 
+# Comment out the create_engagement_dirs function
+"""
 def create_engagement_dirs():
-    """Creates an engagement folder structure."""
+    #Creates an engagement folder structure.
     print_status("Creating engagement directory structure...", "info")
     base_dir = Path("/root")
     
@@ -406,17 +403,12 @@ def create_engagement_dirs():
     print_status(f"Engagement directory structure created at {engagement_dir}", "success")
     
     return engagement_info
+"""
 
 def ensure_tools_dir():
-    """Ensures the tools directory exists and pivots to a new directory if already present."""
+    """Ensures the tools directory exists at /root/ez-rta-tools."""
     print_status("Ensuring tools directory exists...", "info")
-    tools_dir = Path("/root/tools")
-    alternate_tools_dir = Path("/root/ez-rta-tools")
-    
-    if tools_dir.exists():
-        print_status(f"{tools_dir} already exists. Using {alternate_tools_dir} instead.", "warning")
-        tools_dir = alternate_tools_dir
-    
+    tools_dir = Path("/root/ez-rta-tools")
     tools_dir.mkdir(parents=True, exist_ok=True)
     print_status(f"Tools directory ensured at {tools_dir}", "success")
     return tools_dir
@@ -424,7 +416,7 @@ def ensure_tools_dir():
 def install_pretender():
     """Downloads and installs Pretender into a dedicated folder."""
     print_status("Installing Pretender...", "info")
-    tools_dir = Path("/root/tools/pretender")
+    tools_dir = Path("/root/ez-rta-tools/pretender")
     tools_dir.mkdir(parents=True, exist_ok=True)
     
     # Detect system architecture and OS
@@ -472,7 +464,7 @@ def install_pretender():
 def download_DC_Enum_Script():
     """Downloads a DC Enumeration script from GitHub."""
     print_status("Downloading DC Enumeration Script...", "info")
-    tools_dir = Path("/root/tools")
+    tools_dir = Path("/root/ez-rta-tools")
     repo_url = "https://github.com/mbb5546/dc-lookup.git"
     repo_path = tools_dir / "dc-lookup"
     
@@ -498,16 +490,12 @@ def main():
     # Check for dependencies early
     check_dependencies()
     
-    # Verify ZSH environment
-    verify_zsh_environment()
-    
     print(f"\n{Colors.YELLOW}{Colors.BOLD}Select which options you'd prefer to skip:{Colors.END}")
     options = {
-        "1": ("Check if /root/tools directory exists. If it does, tools will be moved to /root/ez-rta-tools", ensure_tools_dir),
+        "1": ("Create tools directory at /root/ez-rta-tools", ensure_tools_dir),
         "2": ("Install Pretender", install_pretender),
         "3": ("Download DC enumeration script", download_DC_Enum_Script),
-        "4": ("Configure Tmux Environment (exclude this option if you prefer screen)", setup_tmux),
-        "5": ("Create Engagement Directory Structure", create_engagement_dirs)
+        "4": ("Configure Tmux Environment with ZSH as default shell", setup_tmux)
     }
 
     print(f"\n{Colors.CYAN}Available options:{Colors.END}")
@@ -520,7 +508,7 @@ def main():
         if key not in skip_options:
             func()
 
-    print(f"\n{Colors.GREEN}{Colors.BOLD}[+] Setup complete.{Colors.END}")
+    print(f"\n${Colors.GREEN}{Colors.BOLD}[+] Setup complete.${Colors.END}")
 
 if __name__ == "__main__":
     main()
