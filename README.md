@@ -1,4 +1,4 @@
-# EZ-RTA (Easy Red Team Automation)
+# EZ-RTA 
 
 A streamlined automation tool designed to set up and configure penetration testing environments quickly and consistently.
 
