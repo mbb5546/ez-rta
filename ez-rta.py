@@ -3,7 +3,7 @@ ez-rta.py - Engagement Setup Automation Tool
 
 A comprehensive setup script for penetration testing engagements that:
 - Verifies and installs required dependencies
-- Configures ZSH and Tmux environments
+- Configures Tmux environment
 - Sets up directory structures for engagements
 - Installs and configures common pentesting tools
 
@@ -27,7 +27,6 @@ Table of Contents:
    - check_dependencies
 
 5. Environment Configuration
-   - verify_zsh_environment
    - setup_tmux
 
 6. Engagement Setup
@@ -214,28 +213,16 @@ def check_core_dependencies():
         "git": {"check": "git --version", "install": "apt-get install -y git"},
         "curl": {"check": "curl --version", "install": "apt-get install -y curl"},
         "tmux": {"check": "tmux -V", "install": "apt-get install -y tmux"},
-    }
-    
-    # Python dependencies
-    python_deps = {
-        "pipx": {"check": "pipx --version", "install": "python3 -m pip install --user pipx"},
-        "virtualenv": {"check": "virtualenv --version", "install": "python3 -m pip install --user virtualenv"}
+        "zsh": {"check": "zsh --version", "install": "apt-get install -y zsh"},
+        # Moving Python dependencies to system deps since we're using apt
+        "pipx": {"check": "pipx --version", "install": "apt-get install -y pipx"},
+        "virtualenv": {"check": "virtualenv --version", "install": "apt-get install -y python3-virtualenv"}
     }
     
     missing = []
     
     # Check system dependencies
     for name, commands in system_deps.items():
-        try:
-            subprocess.run(commands["check"], shell=True, check=True, 
-                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            print_status(f"{name} is installed", "success")
-        except subprocess.CalledProcessError:
-            missing.append((name, commands["install"]))
-            print_status(f"{name} is not installed", "error")
-    
-    # Check Python dependencies
-    for name, commands in python_deps.items():
         try:
             subprocess.run(commands["check"], shell=True, check=True, 
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -259,65 +246,6 @@ def check_core_dependencies():
 def check_dependencies():
     """Check if required dependencies are installed."""
     check_core_dependencies()
-
-def verify_zsh_environment():
-    """Verify that ZSH environment is properly configured."""
-    print_status("Verifying ZSH environment...", "info")
-    
-    home = Path.home()
-    zshrc_path = home / ".zshrc"
-    
-    # Check if ZSH is installed
-    try:
-        subprocess.run("zsh --version", shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print_status("ZSH is installed", "success")
-    except subprocess.CalledProcessError:
-        print_status("ZSH is not installed", "error")
-        if input(f"{Colors.YELLOW}Would you like to install ZSH? (y/n): {Colors.END}").lower() == 'y':
-            result = run_command("apt-get install -y zsh")
-            if not result or result.returncode != 0:
-                print_status("Failed to install ZSH", "error")
-                return False
-    
-    # Check if ZSH is the default shell
-    current_shell = os.environ.get('SHELL', '')
-    if 'zsh' not in current_shell.lower():
-        print_status("ZSH is not the default shell", "warning")
-        if input(f"{Colors.YELLOW}Would you like to make ZSH the default shell? (y/n): {Colors.END}").lower() == 'y':
-            result = run_command("chsh -s /bin/zsh")
-            if result and result.returncode == 0:
-                print_status("ZSH set as default shell", "success")
-            else:
-                print_status("Failed to set ZSH as default shell", "error")
-    else:
-        print_status("ZSH is the default shell", "success")
-    
-    # Verify .zshrc exists and has required configurations
-    if not zshrc_path.exists():
-        print_status(".zshrc file not found, creating it...", "warning")
-        with open(zshrc_path, 'w') as f:
-            f.write("# Created by ez-rta\n")
-    
-    # Check for essential configurations
-    with open(zshrc_path, 'r') as f:
-        content = f.read()
-    
-    required_configs = {
-        'PATH': 'export PATH=',
-        'pipx completions': 'register-python-argcomplete pipx'
-    }
-    
-    missing_configs = []
-    for config, pattern in required_configs.items():
-        if pattern not in content:
-            missing_configs.append(config)
-    
-    if missing_configs:
-        print_status(f"Missing configurations in .zshrc: {', '.join(missing_configs)}", "warning")
-        return False
-    
-    print_status("ZSH environment is properly configured", "success")
-    return True
 
 def setup_tmux():
     """Creates a Tmux configuration file and installs tmux plugin manager."""
