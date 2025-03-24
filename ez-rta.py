@@ -7,6 +7,11 @@ A comprehensive setup script for penetration testing engagements that:
 - Sets up directory structures for engagements
 - Installs and configures common pentesting tools
 
+Version: 1.0.0
+Release Date: 2024-03-15
+Author: Your Name
+License: MIT
+
 Table of Contents:
 1. Imports and Constants
 2. Utility Classes and Functions
@@ -52,6 +57,12 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
+# Version information
+__version__ = "1.0.0"
+__release_date__ = "2024-03-15"
+__author__ = "Your Name"
+__license__ = "MIT"
+
 # ============================================================================
 # 2. Utility Classes and Functions
 # ============================================================================
@@ -85,6 +96,7 @@ def print_banner():
  |______|/_____|      |_|  \\_\\  |_|/_/    \\_\\{Colors.END}
                                              
 {Colors.BLUE}{Colors.BOLD}[ Engagement Setup Automation Tool ]{Colors.END}
+{Colors.YELLOW}Version: {__version__} ({__release_date__}){Colors.END}
 """
     print(banner)
 

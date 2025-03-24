@@ -1,0 +1,5 @@
+[33m0fac149[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m updated README
+[33m031e2c5[m Add README.md to provide an overview, installation instructions, features, and troubleshooting for EZ-RTA. This documentation enhances user understanding and guides setup for penetration testing environments.
+[33m8c71e24[m Refactor ez-rta.py by removing ZSH environment verification and related configurations, and updating dependency checks to use apt for Python packages. Streamline the documentation to reflect these changes.
+[33m4a733d7[m Update ez-rta.py to clarify plugin installation instructions and remove the obsolete test_ez-rta.sh file, streamlining the project structure.
+[33m1265432[m Enhance ez-rta.py by adding tmux logging functionality, creating a logs directory, and updating the tmux configuration with improved status bar information and plugin instructions. Include reminders for activating the new configuration and managing logs.
