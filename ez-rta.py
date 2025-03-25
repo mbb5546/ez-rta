@@ -7,7 +7,7 @@ A comprehensive setup script for penetration testing engagements that:
 - Sets up directory structures for engagements
 - Installs and configures common pentesting tools
 
-Version: 1.1.0
+Version: 1.2.0
 Release Date: 2024-03-15
 Author: Your Name
 License: MIT
@@ -58,9 +58,9 @@ from pathlib import Path
 from datetime import datetime
 
 # Version information
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __release_date__ = "2024-03-15"
-__author__ = "Your Name"
+__author__ = "Claude 3.5 Sonnet"
 __license__ = "MIT"
 
 # ============================================================================
@@ -378,7 +378,10 @@ def ensure_tools_dir():
 
 def install_pretender():
     """Downloads and installs Pretender into a dedicated folder."""
+    version = "v1.3.2"  # Hardcoded stable version
     print_status("Installing Pretender...", "info")
+    print_status(f"Note: Installing stable version {version}. For newer versions, please visit: https://github.com/RedTeamPentesting/pretender/releases", "info")
+    
     tools_dir = Path("/root/ez-rta-tools/pretender")
     tools_dir.mkdir(parents=True, exist_ok=True)
     
@@ -399,9 +402,7 @@ def install_pretender():
     
     if system != "linux":
         print_status(f"Unsupported operating system: {system}. The pretender tool requires Linux.", "error")
-        return
-    
-    version = "v1.3.2"  # Using stable version instead of checking GitHub
+        return False
     
     # Construct the download URL
     pretender_url = f"https://github.com/RedTeamPentesting/pretender/releases/download/{version}/pretender_Linux_{arch}.tar.gz"
@@ -419,10 +420,14 @@ def install_pretender():
         # Verify installation
         if (tools_dir / "pretender").exists():
             print_status(f"Pretender {version} successfully installed in {tools_dir}", "success")
+            print_status("To update to a newer version in the future, download it from: https://github.com/RedTeamPentesting/pretender/releases", "info")
+            return True
         else:
             print_status(f"Pretender executable not found after installation. Check for errors.", "error")
+            return False
     else:
         print_status("Failed to download Pretender", "error")
+        return False
 
 def download_DC_Enum_Script():
     """Downloads a DC Enumeration script from GitHub."""
@@ -443,6 +448,111 @@ def download_DC_Enum_Script():
     else:
         print_status("Failed to download DC Lookup script", "error")
 
+def install_impacket():
+    """Install Impacket using pipx."""
+    print_status("Installing Impacket...", "info")
+    try:
+        result = run_command("pipx install impacket")
+        if result and result.returncode == 0:
+            print_status("Impacket installed successfully", "success")
+            return True
+        print_status("Failed to install Impacket", "error")
+        return False
+    except Exception as e:
+        print_status(f"Error installing Impacket: {str(e)}", "error")
+        return False
+
+def install_netexec():
+    """Install NetExec with fallback to apt if pipx fails."""
+    print_status("Installing NetExec...", "info")
+    try:
+        # Try pipx installation first
+        result = run_command("pipx install git+https://github.com/Pennyw0rth/NetExec")
+        if result and result.returncode == 0:
+            print_status("NetExec installed successfully via pipx", "success")
+            return True
+        
+        # If pipx fails, try apt
+        print_status("Pipx installation failed, attempting to install via apt...", "warning")
+        result = run_command("apt-get install -y netexec")
+        if result and result.returncode == 0:
+            print_status("NetExec installed successfully via apt", "success")
+            return True
+            
+        print_status("Failed to install NetExec", "error")
+        return False
+    except Exception as e:
+        print_status(f"Error installing NetExec: {str(e)}", "error")
+        return False
+
+def install_powerview():
+    """Install PowerView.py using pipx."""
+    print_status("Installing PowerView.py...", "info")
+    try:
+        result = run_command('pipx install "git+https://github.com/aniqfakhrul/powerview.py"')
+        if result and result.returncode == 0:
+            print_status("PowerView.py installed successfully", "success")
+            return True
+        print_status("Failed to install PowerView.py", "error")
+        return False
+    except Exception as e:
+        print_status(f"Error installing PowerView.py: {str(e)}", "error")
+        return False
+
+def install_tools(selected_tools=None):
+    """Central function to manage tool installation.
+    
+    Args:
+        selected_tools (list, optional): List of tool names to install. If None, installs all tools.
+    """
+    print_status("Starting tool installation...", "info")
+    
+    # Define available tools with their installation details
+    available_tools = {
+        "pretender": {
+            "type": "binary",
+            "install_func": install_pretender,
+            "description": "LLMNR/NBT-NS/MDNS AND DHCPv6 Spoofing Tool (an alternative to Responder)"
+        },
+        "dc-lookup": {
+            "type": "script",
+            "install_func": download_DC_Enum_Script,
+            "description": "Helpful python script for DC enumeration"
+        },
+        "impacket": {
+            "type": "python",
+            "install_func": install_impacket,
+            "description": "Because how can we do pentesting without impacket?"
+        },
+        "netexec": {
+            "type": "python",
+            "install_func": install_netexec,
+            "description": "Everyone's favorite tool)"
+        },
+        "powerview": {
+            "type": "python",
+            "install_func": install_powerview,
+            "description": "A python port of PowerView.ps1 - comes in handy if you like the original PowerView.ps1"
+        }
+    }
+    
+    if selected_tools is None:
+        selected_tools = available_tools.keys()
+    
+    # Install selected tools
+    for tool in selected_tools:
+        if tool not in available_tools:
+            print_status(f"Unknown tool: {tool}", "error")
+            continue
+            
+        tool_info = available_tools[tool]
+        print_status(f"Installing {tool} ({tool_info['description']})...", "info")
+        
+        if tool_info["install_func"]():
+            print_status(f"{tool} installation completed", "success")
+        else:
+            print_status(f"{tool} installation failed", "error")
+
 def main():
     if os.geteuid() != 0:
         print_status("Please run this script as root.", "error")
@@ -456,9 +566,8 @@ def main():
     print(f"\n{Colors.YELLOW}{Colors.BOLD}Select which options you'd prefer to skip:{Colors.END}")
     options = {
         "1": ("Create tools directory at /root/ez-rta-tools", ensure_tools_dir),
-        "2": ("Install Pretender", install_pretender),
-        "3": ("Download DC enumeration script", download_DC_Enum_Script),
-        "4": ("Configure Tmux Environment with ZSH as default shell", setup_tmux)
+        "2": ("Install tools", install_tools),
+        "3": ("Configure Tmux Environment with ZSH as default shell", setup_tmux)
     }
 
     print(f"\n{Colors.CYAN}Available options:{Colors.END}")

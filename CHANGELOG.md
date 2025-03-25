@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2024-03-15
+
+### Added
+- Support for installing common Python pentesting tools:
+  - Impacket: Network protocol implementation tool
+  - NetExec (formerly CrackMapExec): Network authentication tester
+  - PowerView.py: Windows domain enumeration tool
+- Enhanced Python tool installation with fallback mechanisms
+- Improved pipx integration for Python tool management
+
+### Changed
+- Updated Pretender installation to use stable version v1.3.2
+- Enhanced user notifications for tool versions and update paths
+- Improved error handling and status messages for tool installations
+
 ## [1.1.0] - 2024-03-15
 
 ### Added
@@ -48,5 +63,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Included detailed setup instructions in README
 - Added version information to script header
 
+[1.2.0]: https://github.com/yourusername/ez-rta/releases/tag/v1.2.0
 [1.1.0]: https://github.com/yourusername/ez-rta/releases/tag/v1.1.0
 [1.0.0]: https://github.com/yourusername/ez-rta/releases/tag/v1.0.0 
