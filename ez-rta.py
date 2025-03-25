@@ -7,7 +7,7 @@ A comprehensive setup script for penetration testing engagements that:
 - Sets up directory structures for engagements
 - Installs and configures common pentesting tools
 
-Version: 1.0.0
+Version: 1.1.0
 Release Date: 2024-03-15
 Author: Your Name
 License: MIT
@@ -58,7 +58,7 @@ from pathlib import Path
 from datetime import datetime
 
 # Version information
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __release_date__ = "2024-03-15"
 __author__ = "Your Name"
 __license__ = "MIT"
@@ -183,7 +183,7 @@ def update_system():
 
 def check_python_version():
     """Check if Python version meets minimum requirements."""
-    min_version = (3, 7)
+    min_version = (3, 12)
     current_version = sys.version_info[:2]
     
     print_status(f"Checking Python version (minimum required: {min_version[0]}.{min_version[1]})...", "info")
