@@ -22,7 +22,7 @@ EZ-RTA automates the setup of common penetration testing tools and configuration
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/ez-rta.git
+git clone https://github.com/mbb5546/ez-rta.git
 cd ez-rta
 ```
 
