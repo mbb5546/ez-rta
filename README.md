@@ -1,6 +1,6 @@
 # EZ-RTA 
 
-A streamlined automation tool designed to set up and configure penetration testing environments quickly and consistently.
+An introductory automation script designed to set up and configure penetration testing environments quickly and consistently.
 
 ## Overview
 
